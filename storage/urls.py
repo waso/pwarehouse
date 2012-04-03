@@ -3,6 +3,6 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('storage.views',
-    url(r'^$', 'index'),
-    url(r'^items/', 'items'),
+    # url(r'^$', 'index'),
+    # url(r'^items/', 'items'),
 )

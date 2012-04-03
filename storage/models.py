@@ -1,33 +1,33 @@
 from django.db import models
 
 class Category(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length = 200)
     def __unicode__(self):
         return self.name
 
 class Storage(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length = 200)
     def __unicode__(self):
         return self.name
 
 class Currency(models.Model):
-    name = models.CharField(max_length=3)
+    name = models.CharField(max_length = 3)
     def __unicode__(self):
         return self.name
 
-#class Price(models.Model):
-#    amount = models.DecimalField(max_digits=11, decimal_places=5)
-#    currency = models.ForeignKey(Currency)
-#    def __unicode__(self):
-#        return str(self.amount), ' ', self.currency
+class Price(models.Model):
+    amount = models.DecimalField(max_digits = 11, decimal_places = 5)
+    currency = models.ForeignKey(Currency)
+    def __unicode__(self):
+        return str(self.amount) + ' ' + self.currency.name
 
 class TaxRate(models.Model):
-    percentage = models.IntegerField(max_length=2)
+    percentage = models.IntegerField(max_length = 2)
     def __unicode__(self):
         return str(self.percentage)
 
 class Item(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length = 200)
     description = models.TextField()
     category = models.ForeignKey(Category)
     tax_rate = models.ForeignKey(TaxRate)
@@ -36,7 +36,22 @@ class Item(models.Model):
         
 class ItemsBucket(models.Model):
     item = models.ForeignKey(Item)
-    count = models.IntegerField(max_length=6)
-    buy_price = models.DecimalField(max_digits=11, decimal_places=5)
-    sell_price = models.DecimalField(max_digits=11, decimal_places=5)
-    tax = models.ForeignKey(TaxRate)
+    count = models.IntegerField(max_length = 6)
+    buy_price = models.ForeignKey(Price, related_name = 'buy_prices')
+    sell_price = models.ForeignKey(Price, related_name = 'sell_prices')
+    storage = models.ForeignKey(Storage)
+    def __unicode__(self):
+        return self.item.name + ' in ' + storage.name + ' (' + count + ')'
+
+class Country(models.Model):
+    name = models.CharField(max_length = 30)
+    def __unicode__(self):
+        return self.name
+
+class Client(models.Model):
+    name = models.CharField(max_length = 255)
+    address = models.CharField(max_length = 255)
+    zip_code = models.CharField(max_length = 6)
+    country = models.ForeignKey(Country)
+    def __unicode__(self):
+        return self.name

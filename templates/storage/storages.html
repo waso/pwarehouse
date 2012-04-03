@@ -14,16 +14,15 @@
 		<div class="row-fluid">
 			<div class="span2">
 				<ul class="nav nav-tabs nav-stacked">
-					<li class="active"><a href="/items/">Towar</a></li>
+					<li class><a href="/items">Towar</a></li>
 					<li class><a href="/categories">Kategorie</a></li>
-					<li class><a href="/storages">Magazyny</a></li>
+					<li class="active"><a href="/storages">Magazyny</a></li>
 					<li class><a href="/clients">Kontrahenci</a></li>
 				</ul>
 			</div>
 			<div class="span10">
-				<form class="form-search" action="/items/" method="POST">
-					{% csrf_token %}
-					<input type="text" class="input-medium" name="search" value="{{ search }}">
+				<form class="form-search">
+					<input type="text" class="input-medium">
 					<button type="submit" class="btn">Search</button>
 				</form>
 				<div class="tab-content">
@@ -33,39 +32,15 @@
 							<thead>
 								<tr>
 									<th>#</th>
-									<th>Towar</th>
-									<th>Kategoria</th>
-									<th>Ilość</th>
-									<th>Magazyn</th>
-									<th>Cena zakupu</th>
-									<th>Cena sprzedaży</th>
+									<th>Nazwa</th>
 								</tr>
 							</thead>
 							<tbody>
-								{% for item in items.all %}
-									{% if item.itemsbucket_set.count == 0 %}
-										<tr>
-    									<td>{{ item.id }}</td>
-										<td>{{ item.name }}</td>
-										<td>{{ item.category.name }}</td>
-										<td>-</td>
-										<td>-</td>
-										<td>-</td>
-										<td>-</td>
-										</tr>
-									{% else %}
-										{% for bucket in item.itemsbucket_set.all %}
-											<tr>
-	    									<td>{{ item.id }}</td>
-											<td>{{ item.name }}</td>
-											<td>{{ item.category.name }}</td>
-											<td>{{ bucket.count }}</td>
-											<td>{{ bucket.storage.name }}</td>
-											<td>{{ bucket.buy_price }}</td>
-											<td>{{ bucket.sell_price }}</td>
-											</tr>
-										{% endfor %}
-									{% endif %}
+								{% for item in storages.all %}
+								<tr>
+								<td>{{ item.id }}</td>
+								<td>{{ item.name }}</td>
+								</tr>
 								{% endfor %}
 							</tbody>
 						</table>
