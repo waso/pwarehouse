@@ -3,11 +3,34 @@
 {% block title %}Dokumenty{% endblock %}
 
 {% block content %}
+<div class="row-fluid">
+	<div class="span12">
+		<ul class="breadcrumb">
+			{% block breadcrumb %}
+			<li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
+			<li class="active">Dokumenty</li>
+			{% endblock %}
+		</ul>
+	</div>
+	<div class="row-fluid">
+		<div class="span2">
+			<ul class="nav nav-tabs nav-stacked">
+				<li class="{{invoice_active}}"><a href="/documents/invoice">Faktury</a></li>
+				<li class="{{mmplus_active}}"><a href="/documents/mmplus">MM+</a></li>
+				<li class="{{mmminus_active}}"><a href="/documents/mmminus">MM-</a></li>
+				<li class="{{pz_active}}"><a href="/documents/pz">PZ</a></li>
+				<li class="{{wz_active}}"><a href="/documents/wz">WZ</a></li>
+			</ul>
+		</div>
+		<div class="span10">
+			{% block documents_content %}
+			{% endblock %}
+		</div>
+	</div>
 
+</div>
 <hr>
-
 <footer>
-    <p>&copy; Company 2012</p>
+	<p>&copy; Company 2012</p>
 </footer>
-
 {% endblock %}

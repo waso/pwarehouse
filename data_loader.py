@@ -1,4 +1,4 @@
-from storage.models import Category, Storage, Currency, Price, TaxRate, Item, ItemsBucket, Country, Client
+from storage.models import Category, Storage, Currency, Price, TaxRate, Item, ItemsBucket, Country, Client, DocumentType
 from decimal import *
 
 #Populates database with initial data
@@ -50,9 +50,26 @@ def load():
 	ib4 = ItemsBucket(item = it4, count = 10, buy_price = pr1, sell_price = pr2, storage = stor1)
 	ib4.save()
 	
-
+	#adding new country
 	pl = Country(name = 'Polska')
 	pl.save()
 
+	#adding new clients
 	cl1 = Client(name = 'ACMA', address = 'ul. Krakowska 1/2', zip_code = '30100', country = pl)
 	cl1.save()
+	cl2 = Client(name = 'ACMA 2', address = 'ul. Wadowicka 1/2', zip_code = '30100', country = pl)
+	cl2.save()
+	cl3 = Client(name = 'ACMA 3', address = 'ul. Zakopianska 8', zip_code = '30100', country = pl)
+	cl3.save()
+
+	#adding doc types
+	dt1 = DocumentType(name = 'invoice')
+	dt1.save()
+	dt2 = DocumentType(name = 'mmplus')
+	dt2.save()
+	dt3 = DocumentType(name = 'mmminus')
+	dt3.save()
+	dt4 = DocumentType(name = 'pz')
+	dt4.save()
+	dt5 = DocumentType(name = 'wz')
+	dt5.save()

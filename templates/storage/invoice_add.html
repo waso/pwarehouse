@@ -1,0 +1,126 @@
+{% extends "storage/documents.html" %} 
+
+{% block title %}Faktury{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
+<li><a href="/documents">Dokumenty</a> <span class="divider">/</span></li>
+<li><a href="/documents/invoice">Faktury</a> <span class="divider">/</span></li>
+<li class="active">Nowa faktura VAT</li>
+{% endblock %}
+
+{% block documents_content %}
+<form class="form-horizontal">
+	<fieldset>
+		<legend>Nowa faktura VAT</legend>
+		<div class="control-group">
+			<label class="control-label" for="input01">Faktura nr</label>
+			<div class="controls">
+				<div class="input-append">
+					<input type="text" class="input-small" style="text-align: right" id="input01">
+					<span class="add-on">/2012</span>
+				</div>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="input01">Kontrahent</label>
+			<div class="controls" id="client_address">
+				<button class="btn btn-info" data-toggle="modal" href="#add_client">Wybierz</button>
+			</div>
+		</div>
+	</fieldset>
+	<table class="table table-condensed">
+		<thead>
+			<tr>
+				<th colspan="4"><button class="btn btn-info" data-toggle="modal" href="#add_item">Dodaj towar</button></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>1</td>
+				<td>Mark</td>
+				<td>Otto</td>
+				<td>@mdo</td>
+			</tr>
+			<tr>
+				<td>2</td>
+				<td>Jacob</td>
+				<td>Thornton</td>
+				<td>@fat</td>
+			</tr>
+			<tr>
+				<td>3</td>
+				<td colspan="2">Larry the Bird</td>
+				<td>@twitter</td>
+			</tr>
+		</tbody>
+	</table>
+</table>
+</form>
+<div id="add_client" class="modal hide" >
+	<div class="modal-header">
+		<a class="close" data-dismiss="modal">×</a>
+		<h3>Kontrahenci</h3>
+	</div>
+	<div class="modal-body">
+		<table class="table">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Nazwa</th>
+						<th>Address</th>
+						<th>Kraj</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in clients.all %}					
+					<tr>
+						<td>{{ item.id }}</td>
+						<td>{{ item.name }}</td>
+						<td>{{ item.address }}</td>
+						<td>{{ item.country.name }}</td>
+						<td>
+							<button class="btn btn-info" data-toggle="modal" onclick="displaymessage('{{ item.id }}','{{ item.name}}','{{ item.address }}','{{ item.country.name }}')">Wybierz</button>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+ 	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal">Close</a>
+	</div>
+</div>
+<div id="add_item" class="modal hide" >
+	<div class="modal-header">
+		<a class="close" data-dismiss="modal">×</a>
+		<h3>Kontrahenci</h3>
+	</div>
+	<div class="modal-body">
+		<table class="table">
+				<thead>
+					<tr>
+						<th>Towar</th>
+						<th>Ilosc</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>{{ item.id }}</td>
+						<td>{{ item.name }}</td>
+						<td>{{ item.address }}</td>
+						<td>{{ item.country.name }}</td>
+						<td>
+							<button class="btn btn-info" data-toggle="modal" onclick="displaymessage('{{ item.id }}','{{ item.name}}','{{ item.address }}','{{ item.country.name }}')">Dodaj</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+ 	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal">Close</a>
+	</div>
+</div>
+{% endblock %}

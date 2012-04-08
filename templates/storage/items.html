@@ -1,97 +1,81 @@
 {% extends "storage/base.html" %} {% block title %}Towar{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-	<div class="row-fluid">
-		<div class="span12">
-			<ul class="breadcrumb">
-				<li><a href="#">Hurtownia</a> <span class="divider">/</span></li>
-				<li><a href="#">Towar</a> <span class="divider">/</span></li>
-				<li class="active">Data</li>
-			</ul>
-
-		</div>
-		<div class="row-fluid">
-			<div class="span2">
-				<ul class="nav nav-tabs nav-stacked">
-					<li class="active"><a href="/items/">Towar</a></li>
-					<li class><a href="/categories">Kategorie</a></li>
-					<li class><a href="/storages">Magazyny</a></li>
-					<li class><a href="/clients">Kontrahenci</a></li>
-				</ul>
-			</div>
-			<div class="span10">
-				<form class="form-search" action="/items/" method="POST">
-					{% csrf_token %}
-					<input type="text" class="input-medium" name="search" value="{{ search }}">
-					<button type="submit" class="btn">Search</button>
-				</form>
-				<div class="tab-content">
-					<div class="tab-pane active" id="1A">
-
-						<table class="table">
-							<thead>
-								<tr>
-									<th>#</th>
-									<th>Towar</th>
-									<th>Kategoria</th>
-									<th>Ilość</th>
-									<th>Magazyn</th>
-									<th>Cena zakupu</th>
-									<th>Cena sprzedaży</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for item in items.all %}
-									{% if item.itemsbucket_set.count == 0 %}
-										<tr>
-    									<td>{{ item.id }}</td>
-										<td>{{ item.name }}</td>
-										<td>{{ item.category.name }}</td>
-										<td>-</td>
-										<td>-</td>
-										<td>-</td>
-										<td>-</td>
-										</tr>
-									{% else %}
-										{% for bucket in item.itemsbucket_set.all %}
-											<tr>
-	    									<td>{{ item.id }}</td>
-											<td>{{ item.name }}</td>
-											<td>{{ item.category.name }}</td>
-											<td>{{ bucket.count }}</td>
-											<td>{{ bucket.storage.name }}</td>
-											<td>{{ bucket.buy_price }}</td>
-											<td>{{ bucket.sell_price }}</td>
-											</tr>
-										{% endfor %}
-									{% endif %}
-								{% endfor %}
-							</tbody>
-						</table>
-					</div>
-					<div class="tab-pane" id="1B">Content 2</div>
-					<div class="tab-pane" id="1C">Content 3</div>
-				</div>
-			</div>
-		</div>
+<div class="row-fluid">
+	<div class="span12">
+		<ul class="breadcrumb">
+			<li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
+			{% if search %}
+			<li><a href="/items">Towar</a> <span class="divider">/</span></li>
+			<li>Wyniki dla "{{ search }}"</li>
+			{% else %}
+			<li class="active">Towar</li>
+			{% endif %}
+			
+		</ul>
 
 	</div>
-
-
-
-	<!-- 	<h2>Towar</h2>
-		<p>Donec id elit non mi porta gravida at eget metus. Fusce
-			dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut
-			fermentum massa justo sit amet risus. Etiam porta sem malesuada magna
-			mollis euismod. Donec sed odio dui.</p> -->
+	<div class="row-fluid">
+		<div class="span2">
+			<ul class="nav nav-tabs nav-stacked">
+				<li class="active"><a href="/items/">Towar</a></li>
+				<li class><a href="/categories">Kategorie</a></li>
+				<li class><a href="/storages">Magazyny</a></li>
+				<li class><a href="/clients">Kontrahenci</a></li>
+			</ul>
+		</div>
+		<div class="span10">
+			<form class="form-search" action="/items/" method="POST">
+				{% csrf_token %}
+				<input type="text" class="input-medium" name="search" value="{{ search }}">
+				<button type="submit" class="btn">Search</button>
+			</form>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Towar</th>
+						<th>Kategoria</th>
+						<th>Ilość</th>
+						<th>Magazyn</th>
+						<th>Cena zakupu</th>
+						<th>Cena sprzedaży</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in items.all %}
+					{% if item.itemsbucket_set.count == 0 %}
+					<tr>
+						<td>{{ item.id }}</td>
+						<td>{{ item.name }}</td>
+						<td>{{ item.category.name }}</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					{% else %}
+					{% for bucket in item.itemsbucket_set.all %}
+					<tr>
+						<td>{{ item.id }}</td>
+						<td>{{ item.name }}</td>
+						<td>{{ item.category.name }}</td>
+						<td>{{ bucket.count }}</td>
+						<td>{{ bucket.storage.name }}</td>
+						<td>{{ bucket.buy_price }}</td>
+						<td>{{ bucket.sell_price }}</td>
+					</tr>
+					{% endfor %}
+					{% endif %}
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
 
 </div>
-
 <hr>
-
 <footer>
 	<p>&copy; Company 2012</p>
 </footer>
-
 {% endblock %}

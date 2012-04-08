@@ -1,68 +1,59 @@
 {% extends "storage/base.html" %} {% block title %}Towar{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-	<div class="row-fluid">
-		<div class="span12">
-			<ul class="breadcrumb">
-				<li><a href="#">Hurtownia</a> <span class="divider">/</span></li>
-				<li><a href="#">Towar</a> <span class="divider">/</span></li>
-				<li class="active">Data</li>
-			</ul>
-
-		</div>
-		<div class="row-fluid">
-			<div class="span2">
-				<ul class="nav nav-tabs nav-stacked">
-					<li class><a href="/items">Towar</a></li>
-					<li class><a href="/categories">Kategorie</a></li>
-					<li class><a href="/storages">Magazyny</a></li>
-					<li class="active"><a href="/clients">Kontrahenci</a></li>
-				</ul>
-			</div>
-			<div class="span10">
-				<form class="form-search">
-					<input type="text" class="input-medium">
-					<button type="submit" class="btn">Search</button>
-				</form>
-				<div class="tab-content">
-					<div class="tab-pane active" id="1A">
-
-						<table class="table">
-							<thead>
-								<tr>
-									<th>#</th>
-									<th>Nazwa</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for item in clients.all %}
-								<tr>
-								<td>{{ item.id }}</td>
-								<td>{{ item.name }}</td>
-								</tr>
-								{% endfor %}
-							</tbody>
-						</table>
-					</div>
-					<div class="tab-pane" id="1B">Content 2</div>
-					<div class="tab-pane" id="1C">Content 3</div>
-				</div>
-			</div>
-		</div>
+<div class="row-fluid">
+	<div class="span12">
+		<ul class="breadcrumb">
+			<li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
+			{% if search %}
+			<li><a href="/clients">Kontrahenci</a> <span class="divider">/</span></li>
+			<li>Wyniki dla "{{ search }}"</li>
+			{% else %}
+			<li class="active">Kontrahenci</li>
+			{% endif %}
+		</ul>
 
 	</div>
-
-
-
-	<!-- 	<h2>Towar</h2>
-		<p>Donec id elit non mi porta gravida at eget metus. Fusce
-			dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut
-			fermentum massa justo sit amet risus. Etiam porta sem malesuada magna
-			mollis euismod. Donec sed odio dui.</p> -->
+	<div class="row-fluid">
+		<div class="span2">
+			<ul class="nav nav-tabs nav-stacked">
+				<li class><a href="/items">Towar</a></li>
+				<li class><a href="/categories">Kategorie</a></li>
+				<li class><a href="/storages">Magazyny</a></li>
+				<li class="active"><a href="/clients">Kontrahenci</a></li>
+			</ul>
+		</div>
+		<div class="span10">
+			<form class="form-search" action="/clients/" method="POST">
+				{% csrf_token %}
+				<input type="text" class="input-medium" name="search" value="{{ search }}">
+				<button type="submit" class="btn">Search</button>
+			</form>
+			<a class="btn" href="/clients/add/"><i class="icon-plus-sign"></i> Dodaj</a>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Nazwa</th>
+						<th>Address</th>
+						<th>Kraj</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in clients.all %}
+					<tr>
+						<td>{{ item.id }}</td>
+						<td>{{ item.name }}</td>
+						<td>{{ item.address }}</td>
+						<td>{{ item.country.name }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
 
 </div>
-
 <hr>
 
 <footer>

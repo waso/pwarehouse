@@ -32,10 +32,21 @@ body {
 	href="{{ STATIC_URL }}img/apple-touch-icon-72x72.png">
 <link rel="apple-touch-icon" sizes="114x114"
 	href="{{ STATIC_URL }}i/apple-touch-icon-114x114.png">
+
+<script src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
+<script>
+$('#add_client').modal({
+    keyboard: true
+});
+function displaymessage(id, name, address, country)
+{
+	$('#add_client').modal('hide')
+	document.getElementById('client_address').innerHTML = '<address><strong>' + name + '</strong><br>' + address + '<br>' + country + '</address><input type="hidden" name="client_id" value="'+ id +'"><button class="btn btn-info" data-toggle="modal" href="#add_client">Zmień</button>';
+}
+  </script>
 </head>
 
 <body>
-
 	<div class="navbar navbar-fixed-top">
 		<div class="navbar-inner">
 			<div class="container">
@@ -75,6 +86,5 @@ body {
 	<script src="{{ STATIC_URL }}js/bootstrap-collapse.js"></script>
 	<script src="{{ STATIC_URL }}js/bootstrap-carousel.js"></script>
 	<script src="{{ STATIC_URL }}js/bootstrap-typeahead.js"></script>
-
 </body>
 </html>

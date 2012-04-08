@@ -55,3 +55,17 @@ class Client(models.Model):
     country = models.ForeignKey(Country)
     def __unicode__(self):
         return self.name
+
+class DocumentType(models.Model):
+    name = models.CharField(max_length = 30, unique=True)
+
+class DocumentEntry(models.Model):
+    item = models.ForeignKey(Item)
+    count = models.IntegerField(max_length = 6)
+    gross_price = models.ForeignKey(Price)
+
+class Document(models.Model):
+    doc_type = models.ForeignKey(DocumentType)
+    number = models.CharField(max_length = 30)
+    items = models.ManyToManyField(DocumentEntry)
+    client = models.ForeignKey(Client)

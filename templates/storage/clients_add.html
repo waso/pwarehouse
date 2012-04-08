@@ -1,0 +1,54 @@
+{% extends "storage/base.html" %} {% block title %}Towar{% endblock %}
+
+{% block content %}
+<div class="row-fluid">
+	<div class="span12">
+		<ul class="breadcrumb">
+			<li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
+			<li><a href="/">Kontrahenci</a> <span class="divider">/</span></li>
+			<li class="active">Nowy</li>
+		</ul>
+	</div>
+	<div class="row-fluid">
+		<div class="span2">
+			<ul class="nav nav-tabs nav-stacked">
+				<li class><a href="/items">Towar</a></li>
+				<li class><a href="/categories">Kategorie</a></li>
+				<li class><a href="/storages">Magazyny</a></li>
+				<li class><a href="/clients">Kontrahenci</a></li>
+			</ul>
+		</div>
+		<div class="span10">
+			<form action="/clients/add/" method="post">
+				{% csrf_token %}
+				{{ form.non_field_errors }}
+				<div class="fieldWrapper">
+					{{ form.name.errors }}
+					<label for="id_name">Nazwa:</label>
+					{{ form.name }}
+				</div>
+				<div class="fieldWrapper">
+					{{ form.address.errors }}
+					<label for="id_address">Adres:</label>
+					{{ form.address }}
+				</div>
+				<div class="fieldWrapper">
+					{{ form.zip_code.errors }}
+					<label for="id_zip_code">ZIP:</label>
+					{{ form.zip_code }}
+				</div>
+				<div class="fieldWrapper">
+					{{ form.country.errors }}
+					<label for="id_country">Kraj:</label>
+					{{ form.country }}
+				</div>
+				<p><input type="submit" value="Dodaj" /></p>
+			</form>
+		</div>
+	</div>
+</div>
+<hr>
+<footer>
+	<p>&copy; Company 2012</p>
+</footer>
+{% endblock %}
