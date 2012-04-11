@@ -3,6 +3,57 @@
 {% block title %}Faktury{% endblock %}
 
 {% block breadcrumb %}
+<script>
+function displaymessage(id, name, address, country)
+{
+	document.getElementById('client_address').innerHTML = '<address><strong>' + name + '</strong><br>' + address + '<br>' + country + '</address><input type="hidden" name="client_id" value="'+ id +'"><button class="btn btn-info" data-toggle="modal" href="#add_client">Zmień</button>';
+	$('#add_client').modal('hide')
+}
+
+function add_invoice_item(id, name, sell_price, count, tax)
+{
+	var table = document.getElementById('items_to_sell');
+	var rowCount = table.rows.length;
+	var row = table.insertRow(rowCount);
+
+	var cell0 = row.insertCell(0);
+	cell0.innerHTML = '<td>' + rowCount + '</td>'
+
+	var cell1 = row.insertCell(1);
+	cell1.innerHTML = '<td>' + name + '</td>'
+
+	var cell2 = row.insertCell(2);
+	cell2.innerHTML = '<td>' + count + '</td>'
+
+	var cell3 = row.insertCell(3);
+	cell3.innerHTML = '<td>' + sell_price + '</td>'
+
+	var cell4 = row.insertCell(4);
+	cell4.innerHTML = '<td><button class="btn btn-info" data-toggle="modal"  onclick="remove_invoice_item(' + rowCount + ')">Usun</button></td>'
+
+	$('#add_item').modal('hide')
+}
+
+function remove_invoice_item(index)
+{
+    try
+    {
+    	var table = document.getElementById('items_to_sell');
+    	table.deleteRow(index);
+    	var rowCount = table.rows.length;
+    	for(var i=1; i<rowCount; i++) 
+    	{
+            var row = table.rows[i];
+            row.cells[0].innerHTML = '<td>' + i + '</td>'
+            row.cells[4].innerHTML = '<td><button class="btn btn-info" data-toggle="modal"  onclick="remove_invoice_item(' + i + ')">Usun</button></td>'
+        }
+    }
+    catch(e) 
+    {
+    	alert(e);
+    }
+}
+</script>
 <li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
 <li><a href="/documents">Dokumenty</a> <span class="divider">/</span></li>
 <li><a href="/documents/invoice">Faktury</a> <span class="divider">/</span></li>
@@ -29,30 +80,21 @@
 			</div>
 		</div>
 	</fieldset>
-	<table class="table table-condensed">
+	<button class="btn btn-info" data-toggle="modal" href="#add_item">Dodaj towar</button><br><br>
+	<table class="table table-condensed" id="items_to_sell">
 		<thead>
-			<tr>
+			<!-- <tr>
 				<th colspan="4"><button class="btn btn-info" data-toggle="modal" href="#add_item">Dodaj towar</button></th>
+			</tr> -->
+			<tr>
+				<th>#</th>
+				<th>Nazwa</th>
+				<th>Ilość</th>
+				<th>Cena</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<td>1</td>
-				<td>Mark</td>
-				<td>Otto</td>
-				<td>@mdo</td>
-			</tr>
-			<tr>
-				<td>2</td>
-				<td>Jacob</td>
-				<td>Thornton</td>
-				<td>@fat</td>
-			</tr>
-			<tr>
-				<td>3</td>
-				<td colspan="2">Larry the Bird</td>
-				<td>@twitter</td>
-			</tr>
 		</tbody>
 	</table>
 </table>
@@ -64,61 +106,69 @@
 	</div>
 	<div class="modal-body">
 		<table class="table">
-				<thead>
-					<tr>
-						<th>#</th>
-						<th>Nazwa</th>
-						<th>Address</th>
-						<th>Kraj</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for item in clients.all %}					
-					<tr>
-						<td>{{ item.id }}</td>
-						<td>{{ item.name }}</td>
-						<td>{{ item.address }}</td>
-						<td>{{ item.country.name }}</td>
-						<td>
-							<button class="btn btn-info" data-toggle="modal" onclick="displaymessage('{{ item.id }}','{{ item.name}}','{{ item.address }}','{{ item.country.name }}')">Wybierz</button>
-						</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
- 	</div>
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Nazwa</th>
+					<th>Address</th>
+					<th>Kraj</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in clients.all %}
+				<tr>
+					<td>{{ item.id }}</td>
+					<td>{{ item.name }}</td>
+					<td>{{ item.address }}</td>
+					<td>{{ item.country.name }}</td>
+					<td>
+						<button class="btn btn-info" data-toggle="modal" onclick="displaymessage('{{ item.id }}','{{ item.name}}','{{ item.address }}','{{ item.country.name }}')">Wybierz</button>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 	<div class="modal-footer">
 		<a href="#" class="btn" data-dismiss="modal">Close</a>
 	</div>
 </div>
-<div id="add_item" class="modal hide" >
+<div id="add_item" class="modal hide">
 	<div class="modal-header">
 		<a class="close" data-dismiss="modal">×</a>
-		<h3>Kontrahenci</h3>
+		<h3>Towar</h3>
 	</div>
 	<div class="modal-body">
 		<table class="table">
-				<thead>
-					<tr>
-						<th>Towar</th>
-						<th>Ilosc</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>{{ item.id }}</td>
-						<td>{{ item.name }}</td>
-						<td>{{ item.address }}</td>
-						<td>{{ item.country.name }}</td>
-						<td>
-							<button class="btn btn-info" data-toggle="modal" onclick="displaymessage('{{ item.id }}','{{ item.name}}','{{ item.address }}','{{ item.country.name }}')">Dodaj</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
- 	</div>
+			<thead>
+				<tr>
+					<th>Towar</th>
+					<th>Kategoria</th>
+					<th>Dostępnych</th>
+					<th>Wybór</th>
+					<th>Cena sprzedaży brutto</th>
+					<th>VAT</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in items.all %}
+				<tr>
+					<td>{{ item.item.name }}</td>
+					<td>{{ item.item.category.name }}</td>
+					<td>{{ item.count }}</td>
+					<td><input name="selected_count{{ item.id }}" class="span1" type="text"></td>
+					<td>{{ item.sell_price }}</td>
+					<td>{{ item.item.tax_rate }}%</td>
+					<td>
+						<button class="btn btn-small" data-toggle="modal" onclick="add_invoice_item('{{ item.id }}','{{ item.item.name}}','{{ item.sell_price }}', {{ item.item.tax_rate }})">Dodaj</button>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 	<div class="modal-footer">
 		<a href="#" class="btn" data-dismiss="modal">Close</a>
 	</div>
