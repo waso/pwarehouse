@@ -6,21 +6,28 @@
 <script>
 function displaymessage(id, name, address, country)
 {
-	document.getElementById('client_address').innerHTML = '<address><strong>' + name + '</strong><br>' + address + '<br>' + country + '</address><input type="hidden" name="client_id" value="'+ id +'"><button class="btn btn-info" data-toggle="modal" href="#add_client">Zmień</button>';
+	document.getElementById('client_address').innerHTML = '<address><strong>' + name + '</strong><br>' + address + '<br>' + country + '</address><input type="hidden" name="client_id" value="'+ id +'"><button class="btn" data-toggle="modal" href="#add_client">Zmień</button>';
 	$('#add_client').modal('hide')
 }
 
-function add_invoice_item(id, name, sell_price, count, tax)
+function add_item(id, name, sell_price, tax)
+{
+	add_invoice_item(id, name, sell_price, tax);
+	$('#add_item').modal('hide')
+}
+
+function add_invoice_item(id, name, sell_price, tax)
 {
 	var table = document.getElementById('items_to_sell');
 	var rowCount = table.rows.length;
 	var row = table.insertRow(rowCount);
+	var count = document.getElementById('selected_count' + id).value;
 
 	var cell0 = row.insertCell(0);
 	cell0.innerHTML = '<td>' + rowCount + '</td>'
 
 	var cell1 = row.insertCell(1);
-	cell1.innerHTML = '<td>' + name + '</td>'
+	cell1.innerHTML = '<td><input type="hidden" name="item_id" value="' + id +'"><input type="hidden" name="item_amount" value="' + count +'">' + name + '</td>'
 
 	var cell2 = row.insertCell(2);
 	cell2.innerHTML = '<td>' + count + '</td>'
@@ -29,9 +36,25 @@ function add_invoice_item(id, name, sell_price, count, tax)
 	cell3.innerHTML = '<td>' + sell_price + '</td>'
 
 	var cell4 = row.insertCell(4);
-	cell4.innerHTML = '<td><button class="btn btn-info" data-toggle="modal"  onclick="remove_invoice_item(' + rowCount + ')">Usun</button></td>'
+	cell4.innerHTML = '<td><button class="btn" data-toggle="modal"  onclick="remove_invoice_item(' + rowCount + ')">Usuń</button></td>'
+}
 
-	$('#add_item').modal('hide')
+function add_all_invoice_items()
+{
+	var table = document.getElementById('all_items');
+	var i = 1;
+	var rowCount = table.rows.length;
+	for (; i <= rowCount; i = i + 1) 
+	{
+		var id = table.rows[i].cells[0].innerHTML;
+		var count = document.getElementById('selected_count' + id).value;
+		if (count == 0)
+			continue;
+		var name = document.getElementById('item_name_' + id).innerHTML
+		var sell_price = document.getElementById('item_sell_price_' + id).innerHTML;
+		var tax = document.getElementById('item_tax_' + id).innerHTML;
+		add_invoice_item(id, name, sell_price, tax);
+	}
 }
 
 function remove_invoice_item(index)
@@ -45,7 +68,7 @@ function remove_invoice_item(index)
     	{
             var row = table.rows[i];
             row.cells[0].innerHTML = '<td>' + i + '</td>'
-            row.cells[4].innerHTML = '<td><button class="btn btn-info" data-toggle="modal"  onclick="remove_invoice_item(' + i + ')">Usun</button></td>'
+            row.cells[4].innerHTML = '<td><button class="btn" data-toggle="modal"  onclick="remove_invoice_item(' + i + ')">Usun</button></td>'
         }
     }
     catch(e) 
@@ -76,16 +99,13 @@ function remove_invoice_item(index)
 		<div class="control-group">
 			<label class="control-label" for="input01">Kontrahent</label>
 			<div class="controls" id="client_address">
-				<button class="btn btn-info" data-toggle="modal" href="#add_client">Wybierz</button>
+				<button class="btn" data-toggle="modal" href="#add_client">Wybierz</button>
 			</div>
 		</div>
 	</fieldset>
-	<button class="btn btn-info" data-toggle="modal" href="#add_item">Dodaj towar</button><br><br>
+	<button class="btn" data-toggle="modal" href="#add_item">Dodaj towar</button><br><br>
 	<table class="table table-condensed" id="items_to_sell">
 		<thead>
-			<!-- <tr>
-				<th colspan="4"><button class="btn btn-info" data-toggle="modal" href="#add_item">Dodaj towar</button></th>
-			</tr> -->
 			<tr>
 				<th>#</th>
 				<th>Nazwa</th>
@@ -97,7 +117,7 @@ function remove_invoice_item(index)
 		<tbody>
 		</tbody>
 	</table>
-</table>
+	<input class="btn btn-info" type="submit" value="Zapisz">
 </form>
 <div id="add_client" class="modal hide" >
 	<div class="modal-header">
@@ -123,7 +143,7 @@ function remove_invoice_item(index)
 					<td>{{ item.address }}</td>
 					<td>{{ item.country.name }}</td>
 					<td>
-						<button class="btn btn-info" data-toggle="modal" onclick="displaymessage('{{ item.id }}','{{ item.name}}','{{ item.address }}','{{ item.country.name }}')">Wybierz</button>
+						<button class="btn btn-small" data-toggle="modal" onclick="displaymessage('{{ item.id }}','{{ item.name}}','{{ item.address }}','{{ item.country.name }}')">Wybierz</button>
 					</td>
 				</tr>
 				{% endfor %}
@@ -140,7 +160,7 @@ function remove_invoice_item(index)
 		<h3>Towar</h3>
 	</div>
 	<div class="modal-body">
-		<table class="table">
+		<table class="table" id="all_items">
 			<thead>
 				<tr>
 					<th>Towar</th>
@@ -155,14 +175,15 @@ function remove_invoice_item(index)
 			<tbody>
 				{% for item in items.all %}
 				<tr>
-					<td>{{ item.item.name }}</td>
-					<td>{{ item.item.category.name }}</td>
-					<td>{{ item.count }}</td>
-					<td><input name="selected_count{{ item.id }}" class="span1" type="text"></td>
-					<td>{{ item.sell_price }}</td>
-					<td>{{ item.item.tax_rate }}%</td>
+					<td style="display:none">{{ item.id }}</td>
+					<td><div id="item_name_{{ item.id }}">{{ item.item.name }}</div></td>
+					<td><div id="item_category_{{ item.id }}">{{ item.item.category.name }}</div></td>
+					<td><div id="item_count{{ item.id }}">{{ item.count }}</div></td>
+					<td><input id="selected_count{{ item.id }}" class="span1" type="text"></td>
+					<td><div id="item_sell_price_{{ item.id }}">{{ item.sell_price }}</div></td>
+					<td><div id="item_tax_{{ item.id }}">{{ item.item.tax_rate }}%</div></td>
 					<td>
-						<button class="btn btn-small" data-toggle="modal" onclick="add_invoice_item('{{ item.id }}','{{ item.item.name}}','{{ item.sell_price }}', {{ item.item.tax_rate }})">Dodaj</button>
+						<button class="btn btn-small" data-toggle="modal" onclick="javascript:add_item('{{ item.id }}','{{ item.item.name}}', '{{ item.sell_price }}', '{{ item.item.tax_rate }}')">Dodaj</button>
 					</td>
 				</tr>
 				{% endfor %}
@@ -170,7 +191,7 @@ function remove_invoice_item(index)
 		</table>
 	</div>
 	<div class="modal-footer">
-		<a href="#" class="btn" data-dismiss="modal">Close</a>
+		<a onclick="javascript:add_all_invoice_items()" class="btn" data-dismiss="modal">Dodaj wszystkie</a>
 	</div>
 </div>
 {% endblock %}

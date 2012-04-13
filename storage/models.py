@@ -19,7 +19,7 @@ class Price(models.Model):
     amount = models.DecimalField(max_digits = 11, decimal_places = 5)
     currency = models.ForeignKey(Currency)
     def __unicode__(self):
-        return str(self.amount) + ' ' + self.currency.name
+        return '{0:.2f} {1}'.format(self.amount, self.currency)
 
 class TaxRate(models.Model):
     percentage = models.IntegerField(max_length = 2)
