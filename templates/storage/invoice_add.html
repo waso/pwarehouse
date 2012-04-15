@@ -27,16 +27,24 @@ function add_invoice_item(id, name, sell_price, tax)
 	cell0.innerHTML = '<td>' + rowCount + '</td>'
 
 	var cell1 = row.insertCell(1);
-	cell1.innerHTML = '<td><input type="hidden" name="item_id" value="' + id +'"><input type="hidden" name="item_amount" value="' + count +'">' + name + '</td>'
+	cell1.innerHTML = '<td> \
+		<input type="hidden" id="item_id_' + rowCount +'" name="item_id_' + rowCount +'" value="' + id +'"> \
+		<input type="hidden" id="item_amount_' + rowCount +'" name="item_amount_' + rowCount +'" value="' + count +'"> \
+		<input type="hidden" id="item_name_' + rowCount +'" name="item_name_' + rowCount +'" value="' + name +'"> \
+		<input type="hidden" id="item_sell_price_' + rowCount +'" name="item_sell_price_' + rowCount +'" value="' + sell_price +'"> \
+		<input type="hidden" id="item_tax_' + rowCount +'" name="item_tax_' + rowCount +'" value="' + tax +'">' + name + '</td>'
 
 	var cell2 = row.insertCell(2);
 	cell2.innerHTML = '<td>' + count + '</td>'
 
 	var cell3 = row.insertCell(3);
-	cell3.innerHTML = '<td>' + sell_price + '</td>'
+	cell3.innerHTML = '<td>' + tax + '</td>'
 
 	var cell4 = row.insertCell(4);
-	cell4.innerHTML = '<td><button class="btn" data-toggle="modal"  onclick="remove_invoice_item(' + rowCount + ')">Usuń</button></td>'
+	cell4.innerHTML = '<td>' + sell_price + '</td>'
+
+	var cell5 = row.insertCell(5);
+	cell5.innerHTML = '<td><button class="btn" data-toggle="modal"  onclick="remove_invoice_item(' + rowCount + ')">Usuń</button></td>'
 }
 
 function add_all_invoice_items()
@@ -62,14 +70,25 @@ function remove_invoice_item(index)
     try
     {
     	var table = document.getElementById('items_to_sell');
-    	table.deleteRow(index);
     	var rowCount = table.rows.length;
+    	var values = []
+    	var row_index = 0;
     	for(var i=1; i<rowCount; i++) 
     	{
-            var row = table.rows[i];
-            row.cells[0].innerHTML = '<td>' + i + '</td>'
-            row.cells[4].innerHTML = '<td><button class="btn" data-toggle="modal"  onclick="remove_invoice_item(' + i + ')">Usun</button></td>'
+    		if(i == index)
+    			continue;
+    		var i_id = document.getElementById('item_id_' + i).value;
+    		var i_amount = document.getElementById('item_amount_' + i).value;
+    		var i_name = document.getElementById('item_name_' + i).value;
+    		var i_sell_price = document.getElementById('item_sell_price_' + i).value;
+    		var i_tax = document.getElementById('item_tax_' + i).value;
+
+    		values[row_index++] = {id: i_id, amount: i_amount, name: i_name, sell_price: i_sell_price, tax: i_tax}
         }
+        for(var i=1; i<rowCount; i++) 
+    		table.deleteRow(1)
+    	for(var i=0; i<values.length; i++) 
+    		add_invoice_item(values[i].id, values[i].name, values[i].sell_price, values[i].tax)
     }
     catch(e) 
     {
@@ -84,20 +103,21 @@ function remove_invoice_item(index)
 {% endblock %}
 
 {% block documents_content %}
-<form class="form-horizontal">
+<form class="form-horizontal" action="/documents/invoice/add" method="post">
+	{% csrf_token %}
 	<fieldset>
 		<legend>Nowa faktura VAT</legend>
 		<div class="control-group">
-			<label class="control-label" for="input01">Faktura nr</label>
+			<label class="control-label" for="invoice_number">Faktura nr</label>
 			<div class="controls">
 				<div class="input-append">
-					<input type="text" class="input-small" style="text-align: right" id="input01">
+					<input type="text" class="input-small" style="text-align: right" name="invoice_number">
 					<span class="add-on">/2012</span>
 				</div>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="input01">Kontrahent</label>
+			<label class="control-label">Kontrahent</label>
 			<div class="controls" id="client_address">
 				<button class="btn" data-toggle="modal" href="#add_client">Wybierz</button>
 			</div>
@@ -110,14 +130,15 @@ function remove_invoice_item(index)
 				<th>#</th>
 				<th>Nazwa</th>
 				<th>Ilość</th>
-				<th>Cena</th>
+				<th>Stawka VAT</th>
+				<th>Cena sprzedaży brutto</th>
 				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 		</tbody>
 	</table>
-	<input class="btn btn-info" type="submit" value="Zapisz">
+	<input class="btn btn-info" type="submit" value="Podgląd">
 </form>
 <div id="add_client" class="modal hide" >
 	<div class="modal-header">

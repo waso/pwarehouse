@@ -80,13 +80,38 @@ def invoice(request):
 		context_instance = RequestContext(request))
 
 def invoice_add(request):
-	clients = Client.objects.order_by('name')
-	items = ItemsBucket.objects.all()
-	return render_to_response('storage/invoice_add.html', 
-    	{'invoice_active':'active', 
-    	'clients': clients,
-    	'items': items },
-    	context_instance = RequestContext(request))
+	if request.method == 'POST':
+		pkeys = []
+		net_prices = []
+		for k,v in request.POST.iteritems():
+			if k.startswith('item_id_'):
+				try:
+					pkey = int(v)
+					pkeys.append(pkey)
+				except:
+					print 'incorrect item id: ' + v + ' for key ' + k
+		items = ItemsBucket.objects.filter(pk__in = pkeys)
+		for item in items:
+			price = item.sell_price.amount
+			tax = item.item.tax_rate.percentage
+			net_prices.append(float(price - (price / 100) * tax))
+		print net_prices
+		client = Client.objects.get(pk = request.POST['client_id'])
+		return render_to_response('storage/invoice_review.html', 
+    		{'invoice_active':'active',
+    		'invoice_number': request.POST['invoice_number'],
+    		'client': client,
+    		'items': items,
+    		'net_prices': net_prices},
+    		context_instance = RequestContext(request))
+	else:
+		clients = Client.objects.order_by('name')
+		items = ItemsBucket.objects.all()
+		return render_to_response('storage/invoice_add.html', 
+    		{'invoice_active':'active', 
+    		'clients': clients,
+    		'items': items },
+    		context_instance = RequestContext(request))
 
 def mmplus(request):
     return render_to_response('storage/mmplus.html', 
