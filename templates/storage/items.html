@@ -62,8 +62,8 @@
 						<td>{{ item.category.name }}</td>
 						<td>{{ bucket.count }}</td>
 						<td>{{ bucket.storage.name }}</td>
-						<td>{{ bucket.buy_price }}</td>
-						<td>{{ bucket.sell_price }}</td>
+						<td>{{ bucket.buy_price }} {{currency}}</td>
+						<td>{{ bucket.sell_price }} {{currency}}</td>
 					</tr>
 					{% endfor %}
 					{% endif %}

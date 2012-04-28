@@ -3,8 +3,12 @@ from django.shortcuts import render_to_response
 from django.forms import ModelForm
 from django.http import HttpResponseRedirect
 from django.db.models import Q
-from models import Item, ItemsBucket, Category, Storage, Client, Country, Document, DocumentType, DocumentEntry
+from models import Item, ItemsBucket, Category, Storage, Client, Country, Document, DocumentType, DocumentEntry, Currency
 from model_forms import ClientAddForm
+from collections import defaultdict
+
+def InvoiceItemDetails():
+	pass
 
 def index(request):
     return render_to_response('storage/index.html', {}, context_instance = RequestContext(request))
@@ -16,8 +20,11 @@ def items(request):
 	else:
 		all_items = Item.objects.all()
 		search = ''
+	currencies = Currency.objects.all()
 	return render_to_response('storage/items.html', 
-		{'items': all_items, 'search':search}, 
+		{'items': all_items,
+		'search':search,
+		'currency': currencies[0] }, 
 		context_instance = RequestContext(request))
 
 def categories(request):
@@ -59,7 +66,10 @@ def clients_add(request):
 	if request.method == 'POST':
 		add_form = ClientAddForm(request.POST)
 		if add_form.is_valid():
-			new_cl = Client(name = add_form.cleaned_data['name'], address = add_form.cleaned_data['address'], zip_code = add_form.cleaned_data['zip_code'], country = add_form.cleaned_data['country'])
+			new_cl = Client(name = add_form.cleaned_data['name'], 
+				address = add_form.cleaned_data['address'], 
+				zip_code = add_form.cleaned_data['zip_code'], 
+				country = add_form.cleaned_data['country'])
 			new_cl.save()
 			return HttpResponseRedirect('/clients/')
 	else:
@@ -72,46 +82,6 @@ def documents(request):
     return render_to_response('storage/documents.html', 
     	{}, 
     	context_instance = RequestContext(request))
-
-def invoice(request):
-	invoices = Document.objects.filter(doc_type__name__exact='invoice')
-	return render_to_response('storage/invoice.html', 
-		{'invoice_active':'active'}, 
-		context_instance = RequestContext(request))
-
-def invoice_add(request):
-	if request.method == 'POST':
-		pkeys = []
-		net_prices = []
-		for k,v in request.POST.iteritems():
-			if k.startswith('item_id_'):
-				try:
-					pkey = int(v)
-					pkeys.append(pkey)
-				except:
-					print 'incorrect item id: ' + v + ' for key ' + k
-		items = ItemsBucket.objects.filter(pk__in = pkeys)
-		for item in items:
-			price = item.sell_price.amount
-			tax = item.item.tax_rate.percentage
-			net_prices.append(float(price - (price / 100) * tax))
-		print net_prices
-		client = Client.objects.get(pk = request.POST['client_id'])
-		return render_to_response('storage/invoice_review.html', 
-    		{'invoice_active':'active',
-    		'invoice_number': request.POST['invoice_number'],
-    		'client': client,
-    		'items': items,
-    		'net_prices': net_prices},
-    		context_instance = RequestContext(request))
-	else:
-		clients = Client.objects.order_by('name')
-		items = ItemsBucket.objects.all()
-		return render_to_response('storage/invoice_add.html', 
-    		{'invoice_active':'active', 
-    		'clients': clients,
-    		'items': items },
-    		context_instance = RequestContext(request))
 
 def mmplus(request):
     return render_to_response('storage/mmplus.html', 

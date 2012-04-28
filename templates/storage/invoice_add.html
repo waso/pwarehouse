@@ -1,5 +1,5 @@
 {% extends "storage/documents.html" %} 
-
+{% load my_custom_templates %}
 {% block title %}Faktury{% endblock %}
 
 {% block breadcrumb %}
@@ -41,7 +41,7 @@ function add_invoice_item(id, name, sell_price, tax)
 	cell3.innerHTML = '<td>' + tax + '</td>'
 
 	var cell4 = row.insertCell(4);
-	cell4.innerHTML = '<td>' + sell_price + '</td>'
+	cell4.innerHTML = '<td>' + sell_price + ' {{currency}}</td>'
 
 	var cell5 = row.insertCell(5);
 	cell5.innerHTML = '<td><button class="btn" data-toggle="modal"  onclick="remove_invoice_item(' + rowCount + ')">Usuń</button></td>'
@@ -59,7 +59,7 @@ function add_all_invoice_items()
 		if (count == 0)
 			continue;
 		var name = document.getElementById('item_name_' + id).innerHTML
-		var sell_price = document.getElementById('item_sell_price_' + id).innerHTML;
+		var sell_price = document.getElementById('item_sell_price_' + id).innerHTML.replace('{{currency}}', '').trim();
 		var tax = document.getElementById('item_tax_' + id).innerHTML;
 		add_invoice_item(id, name, sell_price, tax);
 	}
@@ -107,11 +107,19 @@ function remove_invoice_item(index)
 	{% csrf_token %}
 	<fieldset>
 		<legend>Nowa faktura VAT</legend>
+<!-- 		{% for field in form %}
+	        	{% if field.errors %}
+	        		<div class="alert alert-error span4">
+	        		{{ field.errors }}
+	        		</div>
+	        	{% endif %}
+    	{% endfor %}
+ -->
 		<div class="control-group">
 			<label class="control-label" for="invoice_number">Faktura nr</label>
 			<div class="controls">
 				<div class="input-append">
-					<input type="text" class="input-small" style="text-align: right" name="invoice_number">
+					<input type="text" class="input-small" style="text-align: right" name="invoice_number" value="{{ form.invoice_number.value }}">
 					<span class="add-on">/2012</span>
 				</div>
 			</div>
@@ -119,7 +127,22 @@ function remove_invoice_item(index)
 		<div class="control-group">
 			<label class="control-label">Kontrahent</label>
 			<div class="controls" id="client_address">
-				<button class="btn" data-toggle="modal" href="#add_client">Wybierz</button>
+				{% if form.client_id.value != "" %}
+					<address><strong>{{client.name}}</strong><br>{{client.address}}<br>{{client.country}}</address><input type="hidden" name="client_id" value="{{form.client_id.value}}"><button class="btn" data-toggle="modal" href="#add_client">Zmień</button>
+				{% else %}
+					<button class="btn" data-toggle="modal" href="#add_client">Wybierz</button>
+					<input type="hidden" name="client_id" value="">
+				{% endif %}
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">Forma płatności</label>
+			<div class="controls" id="form_of_payment">
+				<select name="form_of_payment">
+					<option {% if form.form_of_payment.value == "cash"  %} selected="selected" {% endif %} value="cash">Gotówka</option>
+					<option {% if form.form_of_payment.value == "wire_transfer"  %} selected="selected" {% endif %} value="wire_transfer">Przelew</option>
+				</select>
+				<!-- <input type="text" class="input-small" style="text-align: right" name="form_of_payment"> -->
 			</div>
 		</div>
 	</fieldset>
@@ -136,9 +159,24 @@ function remove_invoice_item(index)
 			</tr>
 		</thead>
 		<tbody>
+			{% for item in invoice_items %}
+			<tr>
+				<td>{{forloop.counter}}</td>
+				<td><input type="hidden" id="item_id_{{forloop.counter}}" name="item_id_{{forloop.counter}}" value="{{item.id}}"> 		
+					<input type="hidden" id="item_amount_{{forloop.counter}}" name="item_amount_{{forloop.counter}}" value="{{item.count}}">
+					<input type="hidden" id="item_name_{{forloop.counter}}" name="item_name_{{forloop.counter}}" value="{{item.name}}">
+					<input type="hidden" id="item_sell_price_{{forloop.counter}}" name="item_sell_price_{{forloop.counter}}" value="{{item.sell_price}}">
+					<input type="hidden" id="item_tax_{{forloop.counter}}" name="item_tax_{{forloop.counter}}" value="{{item.tax}}">
+				{{item.name}}</td>
+				<td>{{item.count}}</td>
+				<td>{{item.tax}}%</td>
+				<td>{{item.sell_price|format_price}} {{currency}}</td>
+				<td><button class="btn" data-toggle="modal" onclick="remove_invoice_item({{forloop.counter}})">Usuń</button></td>
+			</tr>
+			{% endfor %}
 		</tbody>
 	</table>
-	<input class="btn btn-info" type="submit" value="Podgląd">
+	<input class="btn btn-info" type="submit" value="Zapisz">
 </form>
 <div id="add_client" class="modal hide" >
 	<div class="modal-header">
@@ -201,10 +239,10 @@ function remove_invoice_item(index)
 					<td><div id="item_category_{{ item.id }}">{{ item.item.category.name }}</div></td>
 					<td><div id="item_count{{ item.id }}">{{ item.count }}</div></td>
 					<td><input id="selected_count{{ item.id }}" class="span1" type="text"></td>
-					<td><div id="item_sell_price_{{ item.id }}">{{ item.sell_price }}</div></td>
+					<td><div id="item_sell_price_{{ item.id }}">{{ item.sell_price|format_price }} {{currency}}</div></td>
 					<td><div id="item_tax_{{ item.id }}">{{ item.item.tax_rate }}%</div></td>
 					<td>
-						<button class="btn btn-small" data-toggle="modal" onclick="javascript:add_item('{{ item.id }}','{{ item.item.name}}', '{{ item.sell_price }}', '{{ item.item.tax_rate }}')">Dodaj</button>
+						<button class="btn btn-small" data-toggle="modal" onclick="javascript:add_item('{{ item.id }}','{{ item.item.name}}', '{{ item.sell_price|format_price }}', '{{ item.item.tax_rate }}')">Dodaj</button>
 					</td>
 				</tr>
 				{% endfor %}

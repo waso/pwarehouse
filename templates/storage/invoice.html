@@ -1,13 +1,32 @@
 {% extends "storage/documents.html" %} 
-
 {% block title %}Faktury{% endblock %}
-
 {% block breadcrumb %}
-				<li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
-				<li><a href="/documents">Dokumenty</a> <span class="divider">/</span></li>
-				<li class="active">Faktury</li>
+<li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
+<li><a href="/documents">Dokumenty</a> <span class="divider">/</span></li>
+<li class="active">Faktury</li>
 {% endblock %}
 
 {% block documents_content %}
 <a class="btn btn-info" href="/documents/invoice/add/">Nowa faktura VAT</a>
+<table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Faktura VAT nr</th>
+        <th>Data</th>
+        <th>Akcje</th>
+    </tr>
+</thead>
+<tbody>
+    {% for invoice in invoices.all %}
+    <tr><a href="xxx">
+        <td>{{forloop.counter}}</td>
+        <td>{{ invoice.number }}</td>
+        <td>{{ invoice.date|date:"d F o" }}</td>
+        <td><a class="btn" href="/documents/invoice/{{invoice.id}}">Pokaz</button> <a class="btn" href="#">WZ</button></td>
+    </a>
+</tr>
+{% endfor %}
+</tbody>
+</table>
 {% endblock %}

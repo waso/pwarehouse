@@ -1,0 +1,89 @@
+{% extends "storage/documents.html" %} 
+{% load my_custom_templates %}
+{% block title %}Faktury{% endblock %}
+{% block breadcrumb %}
+<li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
+<li><a href="/documents">Dokumenty</a> <span class="divider">/</span></li>
+<li><a href="/documents/invoice">Faktury</a> <span class="divider">/</span></li>
+<li class="active">Faktura VAT {{doc.number}}</li>
+{% endblock %}
+
+{% block documents_content %}
+<form class="form-horizontal" action="/documents/invoice/add" method="post">
+	{% csrf_token %}
+	<fieldset>
+		<legend>Faktura VAT {{doc.number}}</legend>
+		<div class="control-group">
+			<label class="control-label" for="input01">Kontrahent</label>
+			<div class="controls" id="client_address">
+				<address><strong>{{ doc.client.name }}</strong><br>{{ doc.client.address }}<br>{{ doc.client.country.name }}</address>
+			</div>
+			<label class="control-label" >Forma płatności</label>
+			<div class="controls">Gotówka</div>
+		</div>
+	</fieldset>
+	<table class="table table-condensed" id="items_to_sell">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Nazwa</th>
+				<th>Ilość</th>
+				<th>Stawka VAT</th>
+				<th>Cena sprzedaży netto</th>
+				<th>Cena sprzedaży brutto</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tbody>
+				{% for item in invoice_items.all %}
+				<tr>
+					<td><div>{{ forloop.counter }}</div></td>
+					<td><div>{{ item.item.name }}</div></td>
+					<td><div>{{ item.count }}</div></td>
+					<td><div>{{ item.tax }}%</div></td>
+					<td><div>{{ item.net_price|format_price }} {{ currency }}</div></td>
+					<td><div>{{ item.gross_price|format_price }} {{ currency }}</div></td>
+					
+				</tr>
+				{% endfor %}
+			</tbody>
+		</tbody>
+	</table>
+	<div class="span10">
+		<div class="span4 offset5">
+			<table class="table table-condensed" id="items_to_sell">
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th>Stawka VAT</th>
+						<th>Kwota Netto</th>
+						<th>Kwota Brutto</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tbody>
+						{% for key, value in net_prices_summary %}
+						<tr>
+							<td></td>
+							<td></td>
+							<td>{{ key }}%</td>
+							<td>{{ value|format_price }} {{ currency }}</td>
+							<td>{{ gross_prices_summary|get_value_by_key:key|format_price }} {{ currency }}</td>
+						</tr>
+						{% endfor %}
+						<tr>
+							<td>Suma</td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td><b><h3>{{ total_price|format_price }} {{ currency }}</h3></b></td>
+						</tr>
+					</tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<a class="btn btn-info" href="/documents/invoice">Powrót</a>
+</form>
+{% endblock %}

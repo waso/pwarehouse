@@ -1,4 +1,4 @@
-from storage.models import Category, Storage, Currency, Price, TaxRate, Item, ItemsBucket, Country, Client, DocumentType
+from storage.models import Category, Storage, Currency, TaxRate, Item, ItemsBucket, Country, Client, DocumentType
 from decimal import *
 
 #Populates database with initial data
@@ -16,11 +16,10 @@ def load():
 	cur1.save()
 
 	#adding new price
-	pr1 = Price(amount = Decimal(100.0000), currency = cur1)
-	pr1.save()
-
-	pr2 = Price(amount = Decimal(120.0000), currency = cur1)
-	pr2.save()
+	# pr1 = Price(amount = Decimal(100.0000), currency = cur1)
+	# pr1.save()
+	# pr2 = Price(amount = Decimal(120.0000), currency = cur1)
+	# pr2.save()
 
 	#adding new tax rate
 	tx = TaxRate(percentage = 12)
@@ -41,13 +40,13 @@ def load():
 	it6.save()
 
 	#adding new items bucket
-	ib1 = ItemsBucket(item = it1, count = 10, buy_price = pr1, sell_price = pr2, storage = stor1)
+	ib1 = ItemsBucket(item = it1, count = 10, buy_price = Decimal(100.0000), sell_price = Decimal(120.0000), storage = stor1)
 	ib1.save()
-	ib2 = ItemsBucket(item = it2, count = 10, buy_price = pr1, sell_price = pr2, storage = stor1)
+	ib2 = ItemsBucket(item = it2, count = 10, buy_price = Decimal(100.0000), sell_price = Decimal(120.0000), storage = stor1)
 	ib2.save()
-	ib3 = ItemsBucket(item = it3, count = 10, buy_price = pr1, sell_price = pr2, storage = stor1)
+	ib3 = ItemsBucket(item = it3, count = 10, buy_price = Decimal(100.0000), sell_price = Decimal(120.0000), storage = stor1)
 	ib3.save()
-	ib4 = ItemsBucket(item = it4, count = 10, buy_price = pr1, sell_price = pr2, storage = stor1)
+	ib4 = ItemsBucket(item = it4, count = 10, buy_price = Decimal(100.0000), sell_price = Decimal(120.0000), storage = stor1)
 	ib4.save()
 	
 	#adding new country
