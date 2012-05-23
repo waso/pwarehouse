@@ -6,7 +6,7 @@
 <script>
 function displaymessage(id, name, address, country)
 {
-	document.getElementById('client_address').innerHTML = '<address><strong>' + name + '</strong><br>' + address + '<br>' + country + '</address><input type="hidden" name="client_id" value="'+ id +'"><button class="btn" data-toggle="modal" href="#add_client">Zmień</button>';
+	document.getElementById('client_address').innerHTML = '<address><strong>' + name + '</strong><br>' + address + '<br>' + country + '</address><input type="hidden" name="client_id" value="'+ id +'"><button class="btn btn-small" data-toggle="modal" href="#add_client">Zmień</button>';
 	$('#add_client').modal('hide')
 }
 
@@ -44,7 +44,7 @@ function add_invoice_item(id, name, sell_price, tax)
 	cell4.innerHTML = '<td>' + sell_price + ' {{currency}}</td>'
 
 	var cell5 = row.insertCell(5);
-	cell5.innerHTML = '<td><button class="btn" data-toggle="modal"  onclick="remove_invoice_item(' + rowCount + ')">Usuń</button></td>'
+	cell5.innerHTML = '<td><button class="btn btn-small" data-toggle="modal"  onclick="remove_invoice_item(' + rowCount + ')">Usuń</button></td>'
 }
 
 function add_all_invoice_items()
@@ -98,7 +98,7 @@ function remove_invoice_item(index)
 </script>
 <li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
 <li><a href="/documents">Dokumenty</a> <span class="divider">/</span></li>
-<li><a href="/documents/invoice">Faktury</a> <span class="divider">/</span></li>
+<li><a href="/documents/invoice">Faktury VAT</a> <span class="divider">/</span></li>
 <li class="active">Nowa faktura VAT</li>
 {% endblock %}
 
@@ -127,10 +127,10 @@ function remove_invoice_item(index)
 		<div class="control-group">
 			<label class="control-label">Kontrahent</label>
 			<div class="controls" id="client_address">
-				{% if form.client_id.value != "" %}
+				{% if form.client_id.value %}
 					<address><strong>{{client.name}}</strong><br>{{client.address}}<br>{{client.country}}</address><input type="hidden" name="client_id" value="{{form.client_id.value}}"><button class="btn" data-toggle="modal" href="#add_client">Zmień</button>
 				{% else %}
-					<button class="btn" data-toggle="modal" href="#add_client">Wybierz</button>
+					<button class="btn btn-small" data-toggle="modal" href="#add_client">Wybierz</button>
 					<input type="hidden" name="client_id" value="">
 				{% endif %}
 			</div>
@@ -146,7 +146,7 @@ function remove_invoice_item(index)
 			</div>
 		</div>
 	</fieldset>
-	<button class="btn" data-toggle="modal" href="#add_item">Dodaj towar</button><br><br>
+	<button class="btn btn-small" data-toggle="modal" href="#add_item">Dodaj towar</button><br><br>
 	<table class="table table-condensed" id="items_to_sell">
 		<thead>
 			<tr>
@@ -171,7 +171,7 @@ function remove_invoice_item(index)
 				<td>{{item.count}}</td>
 				<td>{{item.tax}}%</td>
 				<td>{{item.sell_price|format_price}} {{currency}}</td>
-				<td><button class="btn" data-toggle="modal" onclick="remove_invoice_item({{forloop.counter}})">Usuń</button></td>
+				<td><button class="btn btn-small" data-toggle="modal" onclick="remove_invoice_item({{forloop.counter}})">Usuń</button></td>
 			</tr>
 			{% endfor %}
 		</tbody>

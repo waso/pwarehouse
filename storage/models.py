@@ -55,8 +55,7 @@ class DocumentType(models.Model):
     def __unicode__(self):
         return self.name
 
-class Document(models.Model):
-    doc_type = models.ForeignKey(DocumentType)
+class InvoiceDocument(models.Model):
     form_of_payment = models.CharField(max_length = 15)
     number = models.CharField(max_length = 30)
     client = models.ForeignKey(Client)
@@ -64,10 +63,23 @@ class Document(models.Model):
     def __unicode__(self):
         return self.number
 
-class DocumentEntry(models.Model):
-    document = models.ForeignKey(Document)
+class InvoiceDocumentEntry(models.Model):
+    document = models.ForeignKey(InvoiceDocument)
     item = models.ForeignKey(Item)
     count = models.IntegerField(max_length = 6)
     net_price = models.CharField(max_length = 11)
     gross_price = models.CharField(max_length = 11)
     tax = models.CharField(max_length = 2)
+
+class MmDocument(models.Model):
+    doc_type = models.ForeignKey(DocumentType)
+    number = models.CharField(max_length = 30)
+    storage = models.ForeignKey(Storage)
+    date = models.DateTimeField()
+    def __unicode__(self):
+        return self.number
+
+class MmDocumentEntry(models.Model):
+    document = models.ForeignKey(MmDocument)
+    item = models.ForeignKey(Item)
+    count = models.IntegerField(max_length = 6)

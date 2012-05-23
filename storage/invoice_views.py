@@ -2,14 +2,14 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from django.forms import ModelForm
 from django.http import HttpResponseRedirect
-from models import Item, ItemsBucket, Category, Storage, Client, Country, Document, DocumentType, DocumentEntry, Currency
+from models import Item, ItemsBucket, Category, Storage, Client, Country, InvoiceDocument, InvoiceDocumentEntry, Currency
 from collections import defaultdict
 from forms import InvoiceItem, InvoiceForm
 from datetime import datetime
 
 def invoice(request):
-	# show list of all invoices in the system
-	invoices = Document.objects.filter(doc_type__name__exact='invoice')
+	# show list of all invoices
+	invoices = InvoiceDocument.objects.all()
 	return render_to_response('storage/invoice.html', 
 		{'invoice_active':'active',
 		'invoices': invoices}, 
@@ -56,15 +56,14 @@ def invoice_add(request):
 
 		if not errors and form.is_valid():
 			# no errors, save invoice and push changes
-			doc = Document()
+			doc = InvoiceDocument()
 			doc.number = form.cleaned_data['invoice_number'] + '/2012'
-			doc.doc_type = DocumentType.objects.get(name = 'invoice')
 			doc.date = datetime.now()
 			doc.client = client
 			doc.save()
 			for item in invoice_items:
 				db_item = ItemsBucket.objects.get(pk = item.id)
-				t = DocumentEntry()
+				t = InvoiceDocumentEntry()
 				t.item = db_item.item
 				t.count = item.count
 				price = db_item.sell_price
@@ -107,8 +106,8 @@ def invoice_add(request):
 
 def invoice_view(request, invoice_id):
 	try:
-		doc = Document.objects.get(pk = invoice_id)
-	except Document.DoesNotExist:
+		doc = InvoiceDocument.objects.get(pk = invoice_id)
+	except InvoiceDocument.DoesNotExist:
 		return redirect ('/documents/invoice')
 
 	net_prices_summary = defaultdict(float)
@@ -116,7 +115,7 @@ def invoice_view(request, invoice_id):
 	prices_summary = []
 	net_prices = []
 	total_price = 0.0
-	invoice_items = doc.documententry_set.all()
+	invoice_items = doc.invoicedocumententry_set.all()
 
 	for item in invoice_items:
 		total_price += float(item.gross_price)

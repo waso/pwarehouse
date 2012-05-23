@@ -9,7 +9,11 @@ def load():
 
 	#adding new storage
 	stor1 = Storage(name = 'Magazyn 1')
+	stor2 = Storage(name = 'Magazyn 2')
+	stor3 = Storage(name = 'Magazyn 3')
 	stor1.save()
+	stor2.save()
+	stor3.save()
 
 	#adding new currency
 	cur1 = Currency(name = 'PLN')
@@ -62,13 +66,15 @@ def load():
 	cl3.save()
 
 	#adding doc types
-	dt1 = DocumentType(name = 'invoice')
-	dt1.save()
+	# dt1 = DocumentType(name = 'invoice')
+	# dt1.save()
 	dt2 = DocumentType(name = 'mmplus')
 	dt2.save()
 	dt3 = DocumentType(name = 'mmminus')
 	dt3.save()
-	dt4 = DocumentType(name = 'pz')
-	dt4.save()
-	dt5 = DocumentType(name = 'wz')
-	dt5.save()
+	# dt4 = DocumentType(name = 'pz')
+	# dt4.save()
+	# dt5 = DocumentType(name = 'wz')
+	# dt5.save()
+
+load()

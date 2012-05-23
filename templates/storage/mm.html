@@ -1,0 +1,35 @@
+{% extends "storage/documents.html" %} 
+{% load my_custom_templates %}
+{% block title %}Dokumenty MM+{% endblock %}
+
+{% block breadcrumb %}
+				<li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
+				<li><a href="/documents">Dokumenty</a> <span class="divider">/</span></li>
+				<li class="active">MM</li>
+{% endblock %}
+
+{% block documents_content %}
+<a class="btn btn-info" href="/documents/mm/add/">Nowy dokument MM</a>
+<table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Dokument nr</th>
+        <th>Magazyn</th>
+        <th>Data</th>
+        <th>Akcje</th>
+    </tr>
+</thead>
+<tbody>
+    {% for doc in docs.all %}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td>{{ doc.doc_type.name|mm_prefix }} {{ doc.number }}</td>
+        <td>{{ doc.storage.name }}</td>
+        <td>{{ doc.date|date:"d F o" }}</td>
+        <td><a class="btn" href="/documents/ppmlus/{{doc.id}}">Pokaz</a></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

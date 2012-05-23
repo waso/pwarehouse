@@ -1,0 +1,260 @@
+{% extends "storage/documents.html" %} 
+{% load my_custom_templates %}
+{% block title %}Dokument MM{% endblock %}
+
+{% block breadcrumb %}
+<script>
+function add_storage(id, name, storage_div, storage_form_element, popup_id)
+{
+	document.getElementById(storage_div).innerHTML = '<strong>' + name + '</strong> <input type="hidden" name="'+ storage_form_element +'" value="'+ id +'"><a class="btn btn-small" data-toggle="modal" href="#' + popup_id +'"><i class="icon-edit"></i> Zmień</a>';
+	$('#' + popup_id).modal('hide')
+}
+
+function add_item(id, name)
+{
+	add_invoice_item(id, name);
+	$('#add_item').modal('hide')
+}
+
+function add_invoice_item(id, name)
+{
+	var table = document.getElementById('items_to_move');
+	var rowCount = table.rows.length;
+	var row = table.insertRow(rowCount);
+	var count = document.getElementById('selected_count' + id).value;
+
+	var cell0 = row.insertCell(0);
+	cell0.innerHTML = '<td>' + rowCount + '</td>'
+
+	var cell1 = row.insertCell(1);
+	cell1.innerHTML = '<td> \
+		<input type="hidden" id="item_id_' + rowCount +'" name="item_id_' + rowCount +'" value="' + id +'"> \
+		<input type="hidden" id="item_amount_' + rowCount +'" name="item_amount_' + rowCount +'" value="' + count +'"> \
+		<input type="hidden" id="item_name_' + rowCount +'" name="item_name_' + rowCount +'" value="' + name +'">' + name + '</td>'
+
+	var cell2 = row.insertCell(2);
+	cell2.innerHTML = '<td>' + count + '</td>'
+
+	var cell3 = row.insertCell(3);
+	cell3.innerHTML = '<td><button class="btn" data-toggle="modal"  onclick="remove_invoice_item(' + rowCount + ')">Usuń</button></td>'
+}
+
+function add_all_invoice_items()
+{
+	var table = document.getElementById('all_items');
+	var i = 1;
+	var rowCount = table.rows.length;
+	for (; i <= rowCount; i = i + 1) 
+	{
+		var id = table.rows[i].cells[0].innerHTML;
+		var count = document.getElementById('selected_count' + id).value;
+		if (count == 0)
+			continue;
+		var name = document.getElementById('item_name_' + id).innerHTML
+		add_invoice_item(id, name);
+	}
+}
+
+function remove_invoice_item(index)
+{
+    try
+    {
+    	var table = document.getElementById('items_to_move');
+    	var rowCount = table.rows.length;
+    	var values = []
+    	var row_index = 0;
+    	for(var i=1; i<rowCount; i++) 
+    	{
+    		if(i == index)
+    			continue;
+    		var i_id = document.getElementById('item_id_' + i).value;
+    		var i_amount = document.getElementById('item_amount_' + i).value;
+    		var i_name = document.getElementById('item_name_' + i).value;
+    		values[row_index++] = {id: i_id, amount: i_amount, name: i_name}
+        }
+        for(var i=1; i<rowCount; i++) 
+    		table.deleteRow(1)
+    	for(var i=0; i<values.length; i++) 
+    		add_invoice_item(values[i].id, values[i].name)
+    }
+    catch(e) 
+    {
+    	alert(e);
+    }
+}
+</script>
+<li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
+<li><a href="/documents">Dokumenty</a> <span class="divider">/</span></li>
+<li><a href="/documents/mm">MM</a> <span class="divider">/</span></li>
+<li class="active">Nowy dokument MM</li>
+{% endblock %}
+
+{% block documents_content %}
+<form class="form-horizontal" action="/documents/mm/add" method="post">
+	{% csrf_token %}
+	<fieldset>
+		<legend>Przesunięcie międzymagazynowe MM</legend>
+		<div class="control-group">
+			<label class="control-label" for="invoice_number">Dokument nr </label>
+			<div class="controls">
+				<div class="input-append">
+					<input type="text" class="input-small" style="text-align: right" name="doc_number" value="{{ form.doc_number.value }}">
+					<span class="add-on">/2012</span>
+				</div>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">Z magazynu</label>
+			<div class="controls" id="from_storage">
+				{% if form.from_storage_id.value %}
+					<strong>{{ from_storage.name }}</strong> <input type="hidden" name="from_storage_id" value="{{ form.from_storage_id.value }}"><a class="btn btn-small" data-toggle="modal" href="#select_from_storage"><i class="icon-edit"></i> Zmień</a>
+				{% else %}
+					<button class="btn btn-small" data-toggle="modal" href="#select_from_storage">Wybierz</button>
+					<input type="hidden" name="from_storage_id" value="">
+				{% endif %}
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">Do magazynu</label>
+			<div class="controls" id="to_storage">
+				{% if form.to_storage_id.value %}
+					<strong>{{ to_storage.name }}</strong> <input type="hidden" name="to_storage_id" value="{{ form.to_storage_id.value }}"><a class="btn btn-small" data-toggle="modal" href="#select_to_storage"><i class="icon-edit"></i> Zmień</a>
+				{% else %}
+					<button class="btn btn-small" data-toggle="modal" href="#select_to_storage">Wybierz</button>
+					<input type="hidden" name="to_storage_id" value="">
+				{% endif %}
+			</div>
+		</div>
+	</fieldset>
+	<button class="btn btn-small" data-toggle="modal" href="#add_item">Dodaj towar</button><br><br>
+	<table class="table table-condensed" id="items_to_move">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Nazwa</th>
+				<th>Ilość</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for item in mm_items %}
+			<tr>
+				<td>{{forloop.counter}}</td>
+				<td><input type="hidden" id="item_id_{{forloop.counter}}" name="item_id_{{forloop.counter}}" value="{{item.id}}"> 		
+					<input type="hidden" id="item_amount_{{forloop.counter}}" name="item_amount_{{forloop.counter}}" value="{{item.count}}">
+					<input type="hidden" id="item_name_{{forloop.counter}}" name="item_name_{{forloop.counter}}" value="{{item.name}}">
+				{{item.name}}</td>
+				<td>{{item.count}}</td>
+				<td><button class="btn" data-toggle="modal" onclick="remove_invoice_item({{forloop.counter}})">Usuń</button></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<input class="btn btn-info" type="submit" value="Zapisz">
+</form>
+
+
+<div id="select_from_storage" class="modal hide" >
+	<div class="modal-header">
+		<a class="close" data-dismiss="modal">×</a>
+		<h3>Magazyny</h3>
+	</div>
+	<div class="modal-body">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Nazwa</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for storage in storages.all %}
+				<tr>
+					<td>{{ forloop.counter }}</td>
+					<td>{{ storage.name }}</td>
+					<td>
+						<button class="btn btn-small" data-toggle="modal" onclick="add_storage('{{ storage.id }}','{{ storage.name}}','from_storage', 'from_storage_id', 'select_from_storage')">Wybierz</button>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal">Close</a>
+	</div>
+</div>
+
+<div id="select_to_storage" class="modal hide" >
+	<div class="modal-header">
+		<a class="close" data-dismiss="modal">×</a>
+		<h3>Magazyny</h3>
+	</div>
+	<div class="modal-body">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Nazwa</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for storage in storages.all %}
+				<tr>
+					<td>{{ forloop.counter }}</td>
+					<td>{{ storage.name }}</td>
+					<td>
+						<button class="btn btn-small" data-toggle="modal" onclick="add_storage('{{ storage.id }}','{{ storage.name}}','to_storage', 'to_storage_id', 'select_to_storage')">Wybierz</button>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal">Close</a>
+	</div>
+</div>
+
+
+<div id="add_item" class="modal hide">
+	<div class="modal-header">
+		<a class="close" data-dismiss="modal">×</a>
+		<h3>Towar</h3>
+	</div>
+	<div class="modal-body">
+		<table class="table" id="all_items">
+			<thead>
+				<tr>
+					<th>Towar</th>
+					<th>Kategoria</th>
+					<th>Dostępnych</th>
+					<th>Wybór</th>
+					<th>Magazyn</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in items.all %}
+				<tr>
+					<td style="display:none">{{ item.id }}</td>
+					<td><div id="item_name_{{ item.id }}">{{ item.item.name }}</div></td>
+					<td><div id="item_category_{{ item.id }}">{{ item.item.category.name }}</div></td>
+					<td><div id="item_count{{ item.id }}">{{ item.count }}</div></td>
+					<td><input id="selected_count{{ item.id }}" class="span1" type="text"></td>
+					<td><div id="item_storage_{{ item.id }}">{{ item.storage.name }}</div></td>
+					<td>
+						<button class="btn btn-small" data-toggle="modal" onclick="javascript:add_item('{{ item.id }}','{{ item.item.name}}')">Dodaj</button>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<div class="modal-footer">
+		<a onclick="javascript:add_all_invoice_items()" class="btn" data-dismiss="modal">Dodaj wszystkie</a>
+	</div>
+</div>
+{% endblock %}

@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response
 from django.forms import ModelForm
 from django.http import HttpResponseRedirect
 from django.db.models import Q
-from models import Item, ItemsBucket, Category, Storage, Client, Country, Document, DocumentType, DocumentEntry, Currency
+from models import Item, ItemsBucket, Category, Storage, Client, Country, InvoiceDocument, InvoiceDocumentEntry, Currency
 from model_forms import ClientAddForm
 from collections import defaultdict
 

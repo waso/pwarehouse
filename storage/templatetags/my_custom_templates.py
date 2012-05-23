@@ -17,6 +17,13 @@ def format_price(value):
     	return 'ERROR'
 
 @register.filter
+def mm_prefix(value):
+    if value == 'mmplus':
+        return 'MM+'
+    else:
+        return 'MM-'
+
+@register.filter
 def get_value_by_key(value, key):
 	for item in value:
 		if key == item[0]:
