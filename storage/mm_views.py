@@ -12,7 +12,18 @@ def mm(request):
 		'docs': docs}, 
 		context_instance = RequestContext(request))
 
-def view(request):
+def view(request, doc_id):
+	try:
+		doc = MmDocument.objects.get(pk = doc_id)
+	except MmDocument.DoesNotExist:
+		return redirect ('/documents/mm')
+	doc_items = MmDocumentEntry.objects.filter(document = doc)
+
+	return render_to_response('storage/mm.html', 
+		{'mm_active':'active',
+		'doc_items': doc_items,
+		'doc': doc}, 
+		context_instance = RequestContext(request))
 	pass
 
 def add(request):
@@ -83,9 +94,15 @@ def add(request):
 
 			for item in mm_items:
 				source_bucket = ItemsBucket.objects.get(pk = item.id)
-				p_entry = MmDocumentEntry(document = doc_p, item = source_bucket.item, count = int(item.count))
+				p_entry = MmDocumentEntry(
+					document = doc_p, 
+					item = source_bucket.item, 
+					count = int(item.count))
 				p_entry.save()
-				m_entry = MmDocumentEntry(document = doc_m, item = source_bucket.item, count = -int(item.count))
+				m_entry = MmDocumentEntry(
+					document = doc_m, 
+					item = source_bucket.item, 
+					count = -int(item.count))
 				m_entry.save()
 
 				dest_bucket = ItemsBucket.objects \
@@ -96,7 +113,7 @@ def add(request):
 
 				r = list(dest_bucket[:1])
 				if r:
-					print 'found ' + dest_bucket.count() + ' matching destination buckets'
+					print 'found ' + str(dest_bucket.count()) + ' matching destination buckets'
 					dest_bucket = r[0]
 					dest_bucket.count = dest_bucket.count + int(item.count)
 				else:
@@ -114,7 +131,7 @@ def add(request):
 		else:
 			# errors occured, redisplay the form with errors
 			print errors
-			items = ItemsBucket.objects.all()
+			items = ItemsBucket.objects.filter(count__gt=0)
 			storages = Storage.objects.all()
 			currencies = Currency.objects.all()
 			return render_to_response('storage/mm_add.html', 
@@ -128,7 +145,7 @@ def add(request):
 					'currency': currencies[0]},
 					context_instance = RequestContext(request))
 	else:
-		items = ItemsBucket.objects.all()
+		items = ItemsBucket.objects.filter(count__gt=0)
 		storages = Storage.objects.all()
 		currencies = Currency.objects.all()
 		return render_to_response('storage/mm_add.html', 

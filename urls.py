@@ -17,8 +17,6 @@ urlpatterns = patterns('',
     url(r'^documents/mm/(\d+)$', 'storage.mm_views.view'),
     url(r'^documents/mm/add', 'storage.mm_views.add'),
     url(r'^documents/mm', 'storage.mm_views.mm'),
-    url(r'^documents/pz', 'storage.views.pz'),
-    url(r'^documents/wz', 'storage.views.wz'),
     url(r'^documents/', 'storage.views.documents'),
     url(r'^reports/', 'storage.views.reports'),
 )

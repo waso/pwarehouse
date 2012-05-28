@@ -1,6 +1,6 @@
 {% extends "storage/documents.html" %} 
 {% load my_custom_templates %}
-{% block title %}Faktury{% endblock %}
+{% block title %}Hurtownia - Nowa faktura VAT{% endblock %}
 
 {% block breadcrumb %}
 <script>
@@ -107,14 +107,6 @@ function remove_invoice_item(index)
 	{% csrf_token %}
 	<fieldset>
 		<legend>Nowa faktura VAT</legend>
-<!-- 		{% for field in form %}
-	        	{% if field.errors %}
-	        		<div class="alert alert-error span4">
-	        		{{ field.errors }}
-	        		</div>
-	        	{% endif %}
-    	{% endfor %}
- -->
 		<div class="control-group">
 			<label class="control-label" for="invoice_number">Faktura nr</label>
 			<div class="controls">
@@ -128,7 +120,7 @@ function remove_invoice_item(index)
 			<label class="control-label">Kontrahent</label>
 			<div class="controls" id="client_address">
 				{% if form.client_id.value %}
-					<address><strong>{{client.name}}</strong><br>{{client.address}}<br>{{client.country}}</address><input type="hidden" name="client_id" value="{{form.client_id.value}}"><button class="btn" data-toggle="modal" href="#add_client">Zmień</button>
+					<address><strong>{{client.name}}</strong><br>{{client.address}}<br>{{client.country}}</address><input type="hidden" name="client_id" value="{{form.client_id.value}}"><button class="btn btn-small" data-toggle="modal" href="#add_client">Zmień</button>
 				{% else %}
 					<button class="btn btn-small" data-toggle="modal" href="#add_client">Wybierz</button>
 					<input type="hidden" name="client_id" value="">

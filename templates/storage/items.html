@@ -1,5 +1,5 @@
-{% extends "storage/base.html" %} {% block title %}Towar{% endblock %}
-
+{% extends "storage/base.html" %} {% block title %}Hurtownia - Towar{% endblock %}
+{% load my_custom_templates %}
 {% block content %}
 <div class="row-fluid">
 	<div class="span12">
@@ -62,8 +62,8 @@
 						<td>{{ item.category.name }}</td>
 						<td>{{ bucket.count }}</td>
 						<td>{{ bucket.storage.name }}</td>
-						<td>{{ bucket.buy_price }} {{currency}}</td>
-						<td>{{ bucket.sell_price }} {{currency}}</td>
+						<td>{{ bucket.buy_price|format_price }} {{currency}}</td>
+						<td>{{ bucket.sell_price|format_price }} {{currency}}</td>
 					</tr>
 					{% endfor %}
 					{% endif %}

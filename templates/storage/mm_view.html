@@ -1,0 +1,49 @@
+{% extends "storage/documents.html" %} 
+{% load my_custom_templates %}
+{% block title %}Faktury{% endblock %}
+{% block breadcrumb %}
+<li><a href="/">Hurtownia</a> <span class="divider">/</span></li>
+<li><a href="/documents">Dokumenty</a> <span class="divider">/</span></li>
+<li><a href="/documents/mm">MM</a> <span class="divider">/</span></li>
+<li class="active">{{ doc.doc_type.name|mm_prefix }} {{doc.number}}</li>
+{% endblock %}
+
+{% block documents_content %}
+<form class="form-horizontal" action="#" method="post">
+	{% csrf_token %}
+	<fieldset>
+		<legend>{{ doc.doc_type.name|mm_prefix }} {{doc.number}}</legend>
+		<div class="control-group">
+			<label class="control-label">Magazyn</label>
+			<div class="controls"><strong>{{ doc.storage.name }}</strong></div>
+		</div>
+	</fieldset>
+	<table class="table table-condensed" id="items_to_sell">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Nazwa</th>
+				<th>Ilość</th>
+				<th>Stawka VAT</th>
+				<th>Cena sprzedaży netto</th>
+				<th>Cena sprzedaży brutto</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tbody>
+				{% for entry in doc_items.all %}
+				<tr>
+					<td><div>{{ forloop.counter }}</div></td>
+					<td><div>{{ entry.item.name }}</div></td>
+					<td><div>{{ entry.count }}</div></td>
+					<td><div>{{ entry.item.tax_rate }}%</div></td>
+					<td><div>{{ entry.net_price|format_price }} {{ currency }}</div></td>
+					<td><div>{{ entry.gross_price|format_price }} {{ currency }}</div></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</tbody>
+	</table>
+	<a class="btn btn-info" href="/documents/mm">Powrót</a>
+</form>
+{% endblock %}
